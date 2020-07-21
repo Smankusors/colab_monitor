@@ -135,11 +135,11 @@ logs.forEach(function(log) {
         charts.network_usage[0].data.push(0);
         charts.network_usage[1].data.push(0);
     } else {
-        charts.network_usage[0].data.push(last_net_sent - log.net_bytes_sent);
-        charts.network_usage[1].data.push(last_net_recv - log.net_bytes_recv);
+        charts.network_usage[0].data.push(last_net_sent - log.net_sent);
+        charts.network_usage[1].data.push(last_net_recv - log.net_recv);
     }
-    last_net_sent = log.net_bytes_sent;
-    last_net_recv = log.net_bytes_recv;
+    last_net_sent = log.net_sent;
+    last_net_recv = log.net_recv;
     if (sessionInfo.total_gpu_mem != null) {
         charts.gpu_load[0].data.push(log.gpu_load);
         charts.gpu_memory[0].data.push(log.gpu_mem * sessionInfo.total_gpu_mem);

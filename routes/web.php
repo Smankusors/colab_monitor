@@ -1,6 +1,6 @@
 <?php /** @var Laravel\Lumen\Routing\Router $router */
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+$router->get('/', function() {
+    return view('home');
 });
 
 $router->post('/', ['uses' => 'Controller@NewSession']);

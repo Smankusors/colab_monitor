@@ -1,3 +1,9 @@
 extends base.pug
 block content
-    span wawa
+    div To get started, enter this code below on your notebook 😀
+    pre
+        code
+            | from urllib.request import urlopen
+            | exec(urlopen("http://colab-monitor.smankusors.com/track.py").read())
+    div After that you will see the URL printed to open the monitor 😉
+    br

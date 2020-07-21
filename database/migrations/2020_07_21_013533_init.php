@@ -11,6 +11,7 @@ class Init extends Migration {
             $table->float('total_gpu_mem')->nullable()->comment('MiB');
             $table->float('total_disk_space')->comment('MiB');
             $table->text('gpu_name')->nullable();
+            $table->char('token', 16);
             $table->primary('id');
         });
         Schema::create('logs', function (Blueprint $table) {
