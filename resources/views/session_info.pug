@@ -1,6 +1,35 @@
 extends base.pug
 block content
-    span wawaa
-    select
-        option huh
-        option wawa
+    script(src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js")
+    .container.session_info
+        .row
+            .column
+                h4 5-min load average
+                canvas#loadavg
+            .column
+                h4 CPUs load
+                canvas#cpu_load
+            .column
+                h4 Memory usage
+                canvas#memory_usage
+        .row
+            .column
+                h4 Disk usage
+                canvas#disk_usage
+            .column
+                h4 Network usage
+                canvas#network_usage
+        if sessionInfo['gpu_name'] !== null
+            .row
+                .column=sessionInfo['gpu_name']
+            .row
+                .column
+                    h4 GPU load
+                    canvas#gpu_load
+                .column
+                    h4 GPU memory usage
+                    canvas#gpu_memory
+    script
+        != "var sessionInfo = " + json_encode($sessionInfo) + ";"
+        != "var logs = " + json_encode($logs) + ";"
+    script(src="/js/session_info.js")

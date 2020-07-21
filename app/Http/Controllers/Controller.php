@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Controllers;
 
-use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -25,7 +24,7 @@ class Controller extends BaseController {
         $data = $request->all();
         $data['id'] = $id;
         try {
-            DB::table('logs')->insert($data);
+            DB::table('sessions')->insert($data);
         } catch (QueryException $e) {
             //if there's unknown column, i.e. someone sent bad data,
             if ($e->getCode() === "42S22")
@@ -52,6 +51,7 @@ class Controller extends BaseController {
             return new Response('', 404);
         $data = $request->all();
         $data['id'] = $id;
+        $data['cpus_load'] = join(',', $data['cpus_load']);
         try {
             DB::table('logs')->insert($data);
         } catch (QueryException $e) {
@@ -72,7 +72,7 @@ class Controller extends BaseController {
         $sessionInfo = DB::table('sessions')->where('id', $id)->first();
         if ($sessionInfo === null)
             return new Response('', 404);
-        $logs = DB::table('logs')->where('id', $id)->get();
+        $logs = DB::table('logs')->where('id', $id)->orderBy('time', 'desc')->get();
         return view('session_info', [
             'sessionInfo' => $sessionInfo,
             'logs' => $logs

@@ -7,27 +7,26 @@ class Init extends Migration {
     public function up() {
         Schema::create('sessions', function (Blueprint $table) {
             $table->char('id', 13);
-            $table->integer('total_virt_mem');
-            $table->integer('total_gpu_mem');
-            $table->integer('total_disk_space');
-            $table->text('gpu_name');
+            $table->float('total_virt_mem')->comment('MiB');
+            $table->float('total_gpu_mem')->nullable()->comment('MiB');
+            $table->float('total_disk_space')->comment('MiB');
+            $table->text('gpu_name')->nullable();
             $table->primary('id');
         });
         Schema::create('logs', function (Blueprint $table) {
             $table->char('id', 13);
             $table->timestamp('time')->useCurrent();
             $table->float('5m_loadavg');
-            $table->text('cpus_load');
-            $table->float('virt_mem');
-            $table->float('disk_usage');
-            $table->integer('net_bytes_sent');
-            $table->integer('net_bytes_recv');
-            $table->float('gpu_load');
-            $table->float('gpu_mem');
+            $table->text('cpus_load')->comment("Range from 0 to 100");
+            $table->float('virt_mem')->comment("Range from 0 to 1");
+            $table->float('disk_usage')->comment("Range from 0 to 1");;
+            $table->float('net_sent')->comment('KiB');
+            $table->float('net_recv')->comment('KiB');
+            $table->float('gpu_load')->nullable()->comment("Range from 0 to 1");
+            $table->float('gpu_mem')->nullable()->comment("Range from 0 to 1");;
             $table->foreign('id')->references('id')->on('sessions');
             $table->unique(['id', 'time']);
         });
-
     }
 
     public function down() {
