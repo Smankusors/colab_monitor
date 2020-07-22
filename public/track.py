@@ -14,7 +14,7 @@ class ColabMonitor():
       gpu = GPUtil.getGPUs()[0]
     except:
       gpu = None
-    loadavg = os.getloadavg()[1]
+    loadavg = psutil.getloadavg()[1]
     #disk_counter = psutil.disk_io_counters()
     net_counter = psutil.net_io_counters()
     payload = {
@@ -23,8 +23,8 @@ class ColabMonitor():
       'virt_mem': psutil.virtual_memory().percent / 100,
       'disk_usage': psutil.disk_usage(self.cwd).percent / 100,
       #'disk-counter': [disk_counter.read_bytes, disk_counter.write_bytes],
-      'net_sent': (net_counter.bytes_sent - self._last_bytes_sent) / 1024,
-      'net_recv': (net_counter.bytes_recv - self._last_bytes_recv) / 1024
+      'net_sent': (net_counter.bytes_sent - self._last_bytes_sent) / 1048576,
+      'net_recv': (net_counter.bytes_recv - self._last_bytes_recv) / 1048576
     }
     self._last_bytes_sent = net_counter.bytes_sent
     self._last_bytes_recv = net_counter.bytes_recv

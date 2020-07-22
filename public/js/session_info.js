@@ -62,14 +62,14 @@ yAxisOptions.disk_usage = [{
 }];
 
 charts.network_usage = [{
-    label: 'Sent KiB',
+    label: 'Sent MiB',
     fill: false,
     borderColor: "#00f3",
     backgroundColor: "#00f3",
     borderDash: [5, 5],
     data: []
 }, {
-    label: 'Receive KiB',
+    label: 'Receive MiB',
     fill: false,
     borderColor: "#00f3",
     backgroundColor: "#00f3",

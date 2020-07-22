@@ -21,8 +21,8 @@ class Init extends Migration {
             $table->text('cpus_load')->comment("Range from 0 to 100");
             $table->float('virt_mem')->comment("Range from 0 to 1");
             $table->float('disk_usage')->comment("Range from 0 to 1");;
-            $table->float('net_sent')->comment('KiB');
-            $table->float('net_recv')->comment('KiB');
+            $table->float('net_sent')->comment('MiB');
+            $table->float('net_recv')->comment('MiB');
             $table->float('gpu_load')->nullable()->comment("Range from 0 to 1");
             $table->float('gpu_mem')->nullable()->comment("Range from 0 to 1");;
             $table->foreign('id')->references('id')->on('sessions');
