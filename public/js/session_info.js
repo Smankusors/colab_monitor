@@ -96,7 +96,7 @@ if (sessionInfo.total_gpu_mem != null) {
         backgroundColor: "#0ff3",
         data: []
     }];
-    yAxisOptions.gpu_load = [{
+    yAxisOptions.gpu_memory = [{
         ticks: {
             beginAtZero: true,
             max: sessionInfo.total_gpu_mem
@@ -121,28 +121,20 @@ function line_chart_config(data, yAxesConfig = {}) {
         }
     };
 }
-let last_net_sent = -1;
-let last_net_recv = -1;
+logs.reverse();
 logs.forEach(function(log) {
     timestamps.push(log.time);
     charts.loadavg[0].data.push(log["5m_loadavg"]);
     log.cpus_load.split(",").forEach(function(cpu_load, index) {
         charts.cpu_load[index].data.push(cpu_load);
     });
-    charts.memory_usage[0].data.push(log.virt_mem * sessionInfo.total_virt_mem);
-    charts.disk_usage[0].data.push(log.disk_usage * sessionInfo.total_disk_space);
-    if (last_net_sent == -1) {
-        charts.network_usage[0].data.push(0);
-        charts.network_usage[1].data.push(0);
-    } else {
-        charts.network_usage[0].data.push(last_net_sent - log.net_sent);
-        charts.network_usage[1].data.push(last_net_recv - log.net_recv);
-    }
-    last_net_sent = log.net_sent;
-    last_net_recv = log.net_recv;
+    charts.memory_usage[0].data.push((log.virt_mem * sessionInfo.total_virt_mem).toFixed(2));
+    charts.disk_usage[0].data.push((log.disk_usage * sessionInfo.total_disk_space).toFixed(2));
+    charts.network_usage[0].data.push(log.net_sent);
+    charts.network_usage[1].data.push(log.net_recv);
     if (sessionInfo.total_gpu_mem != null) {
         charts.gpu_load[0].data.push(log.gpu_load);
-        charts.gpu_memory[0].data.push(log.gpu_mem * sessionInfo.total_gpu_mem);
+        charts.gpu_memory[0].data.push((log.gpu_mem * sessionInfo.total_gpu_mem).toFixed(2));
     }
 });
 document.querySelectorAll("canvas").forEach(function(el) {

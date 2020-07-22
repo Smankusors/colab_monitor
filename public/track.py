@@ -23,9 +23,11 @@ class ColabMonitor():
       'virt_mem': psutil.virtual_memory().percent / 100,
       'disk_usage': psutil.disk_usage('/').percent / 100,
       #'disk-counter': [disk_counter.read_bytes, disk_counter.write_bytes],
-      'net_sent': net_counter.bytes_sent / 1024,
-      'net_recv': net_counter.bytes_recv / 1024
+      'net_sent': (net_counter.bytes_sent - self._last_bytes_sent) / 1024,
+      'net_recv': (net_counter.bytes_recv - self._last_bytes_recv) / 1024
     }
+    self._last_bytes_sent = net_counter.bytes_sent
+    self._last_bytes_recv = net_counter.bytes_recv
     if gpu is not None:
       payload['gpu_load'] = gpu.load * 100
       payload['gpu_mem'] = gpu.memoryUtil
@@ -46,6 +48,9 @@ class ColabMonitor():
     except:
       pass
     payload['total_disk_space'] = psutil.disk_usage('/').total / 1048576
+    net_counter = psutil.net_io_counters()
+    self._last_bytes_sent = net_counter.bytes_sent
+    self._last_bytes_recv = net_counter.bytes_recv
     self._response = requests.post('http://185.224.137.80',
                   headers={'Host':'colab-monitor.smankusors.com'},
                   data=payload)
@@ -53,7 +58,7 @@ class ColabMonitor():
       raise Exception('Failed to add new session! Status code: {}'.format(self._response.status_code))
     self.id, self.token = self._response.text.split(",")
     self.post_url = "http://185.224.137.80/" + self.id
-    print("Now live at : " + self.post_url)
+    print("Now live at : http://colab-monitor.smankusors.com/" + self.id)
 
   def loop(self):
     while True:
