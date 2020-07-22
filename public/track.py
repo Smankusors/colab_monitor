@@ -21,7 +21,7 @@ class ColabMonitor():
       '5m_loadavg': loadavg,
       'cpus_load[]': psutil.cpu_percent(percpu=True),
       'virt_mem': psutil.virtual_memory().percent / 100,
-      'disk_usage': psutil.disk_usage('/').percent / 100,
+      'disk_usage': psutil.disk_usage(self.cwd).percent / 100,
       #'disk-counter': [disk_counter.read_bytes, disk_counter.write_bytes],
       'net_sent': (net_counter.bytes_sent - self._last_bytes_sent) / 1024,
       'net_recv': (net_counter.bytes_recv - self._last_bytes_recv) / 1024
@@ -39,6 +39,7 @@ class ColabMonitor():
       raise Exception("Something wrong happened. Status code: {}".format(self._response.status_code))
 
   def __init__(self):
+    self.cwd = os.getcwd()
     payload = {}
     payload['total_virt_mem'] = psutil.virtual_memory().total / 1048576
     try:
@@ -47,7 +48,7 @@ class ColabMonitor():
       payload['gpu_name'] = gpu.name
     except:
       pass
-    payload['total_disk_space'] = psutil.disk_usage('/').total / 1048576
+    payload['total_disk_space'] = psutil.disk_usage(self.cwd).total / 1048576
     net_counter = psutil.net_io_counters()
     self._last_bytes_sent = net_counter.bytes_sent
     self._last_bytes_recv = net_counter.bytes_recv
@@ -63,7 +64,7 @@ class ColabMonitor():
   def loop(self):
     while True:
       self.update()
-      sleep(3)
+      sleep(60)
 
   def start(self):
     thread = Thread(target=self.loop)

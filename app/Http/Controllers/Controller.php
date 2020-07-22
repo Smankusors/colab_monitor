@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -85,9 +86,11 @@ class Controller extends BaseController {
             ->where('id', $id)
             ->orderBy('time', 'desc')
             ->get();
+        $lastUpdated = Carbon::parse($logs[0]->time)->diffForHumans();
         return view('session_info', [
             'sessionInfo' => $sessionInfo,
-            'logs' => $logs
+            'logs' => $logs,
+            'lastUpdated' => $lastUpdated
         ]);
     }
 }
