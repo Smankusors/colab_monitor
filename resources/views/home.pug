@@ -8,4 +8,11 @@ block content
             | exec(urlopen("http://colab-monitor.smankusors.com/track.py").read())
             | _colabMonitor = ColabMonitor().start()
     div After that you will see the URL printed to open the monitor 😉
-    br
+    hr
+    div Optionally, if you want to track the TPU too, change the last line into this
+    pre
+        code
+            | _colabMonitor = ColabMonitor(tpu=tpu).start()
+    div
+        | Where <code>tpu</code> is instance of <a href="https://www.tensorflow.org/api_docs/python/tf/distribute/cluster_resolver/TPUClusterResolver"><code>TPUClusterResolver</code></a>.
+        | (Note: this is not supported on Kaggle notebooks)

@@ -64,15 +64,15 @@ yAxisOptions.disk_usage = [{
 charts.network_usage = [{
     label: 'Sent MiB',
     fill: false,
-    borderColor: "#00f3",
-    backgroundColor: "#00f3",
+    borderColor: "#00f7",
+    backgroundColor: "#00f7",
     borderDash: [5, 5],
     data: []
 }, {
     label: 'Receive MiB',
     fill: false,
-    borderColor: "#00f3",
-    backgroundColor: "#00f3",
+    borderColor: "#00f7",
+    backgroundColor: "#00f7",
     data: []
 }];
 
@@ -107,8 +107,8 @@ if (sessionInfo.total_gpu_mem != null) {
 if (sessionInfo.tpu_type != null) {
     charts.tpu_mxu = [{
         label: 'Matrix Unit Utilization %',
-        borderColor: "#0093",
-        backgroundColor: "#0093",
+        borderColor: "#0097",
+        backgroundColor: "#0097",
         data: []
     }];
     yAxisOptions.tpu_mxu = [{
@@ -120,8 +120,8 @@ if (sessionInfo.tpu_type != null) {
 
     charts.tpu_idle = [{
         label: 'Idle Time %',
-        borderColor: "#0093",
-        backgroundColor: "#0093",
+        borderColor: "#0097",
+        backgroundColor: "#0097",
         data: []
     }];
     yAxisOptions.tpu_idle = [{
