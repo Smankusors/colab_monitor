@@ -6,5 +6,6 @@ block content
             | !echo "185.224.137.80 colab-monitor.smankusors.com" >> /etc/hosts
             | from urllib.request import urlopen
             | exec(urlopen("http://colab-monitor.smankusors.com/track.py").read())
+            | _colabMonitor = ColabMonitor().start()
     div After that you will see the URL printed to open the monitor 😉
     br

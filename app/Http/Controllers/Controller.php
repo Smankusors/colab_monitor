@@ -79,7 +79,7 @@ class Controller extends BaseController {
     public function ViewSession(Request $request, $id) {
         $sessionInfo = DB::table('sessions')
             ->where('id', $id)
-            ->first(['total_virt_mem', 'total_gpu_mem', 'total_disk_space', 'gpu_name']);
+            ->first(['total_virt_mem', 'total_gpu_mem', 'total_disk_space', 'gpu_name', 'tpu_type']);
         if ($sessionInfo === null)
             return new Response('', 404);
         $logs = DB::table('logs')

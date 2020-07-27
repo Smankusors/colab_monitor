@@ -31,6 +31,9 @@ class ColabMonitor():
         if gpu is not None:
             payload['gpu_load'] = gpu.load * 100
             payload['gpu_mem'] = gpu.memoryUtil
+        if self.tpu is not None:
+            payload['tpu_idle'] = self.tpu.idle
+            payload['tpu_mxu'] = self.tpu.mxu
         payload['_token'] = self.token
         self._response = requests.post(
             self.post_url,
@@ -40,7 +43,7 @@ class ColabMonitor():
         if self._response.status_code != 200:
             raise Exception("Something wrong happened. Status code: {}".format(self._response.status_code))
 
-    def __init__(self):
+    def __init__(self, tpu=None):
         self.cwd = os.getcwd()
         payload = {}
         payload['total_virt_mem'] = psutil.virtual_memory().total / 1048576
@@ -50,6 +53,11 @@ class ColabMonitor():
             payload['gpu_name'] = gpu.name
         except:
             pass
+        if tpu is None:
+            self.tpu = None
+        else:
+            self.tpu = self.Tensorflow_TPUMonitor(tpu, self)
+            payload['tpu_type'] = self.tpu.type_n_cores
         payload['total_disk_space'] = psutil.disk_usage(self.cwd).total / 1048576
         net_counter = psutil.net_io_counters()
         self._last_bytes_sent = net_counter.bytes_sent
@@ -63,21 +71,56 @@ class ColabMonitor():
             raise Exception('Failed to add new session! Status code: {}'.format(self._response.status_code))
         self.id, self.token = self._response.text.split(",")
         self.post_url = "http://185.224.137.80/" + self.id
-        self.update_interval = 60
-        print("Now live at : http://colab-monitor.smankusors.com/" + self.id)
+        self._interval = 60
 
     def loop(self):
         while self._isLooping:
             self.update()
-            sleep(self.update_interval)
+            sleep(self._interval)
 
     def start(self):
         thread = Thread(target=self.loop)
         self._isLooping = True
         thread.start()
+        if self.tpu is not None:
+            thread = Thread(target=self.tpu.loop)
+            thread.start()
+        print("Now live at : http://colab-monitor.smankusors.com/" + self.id)
+        return self
+
+    def setInterval(self, interval_s):
+        self._interval = interval_s
         return self
 
     def stop(self):
         self._isLooping = False
+        return self
 
-_colabMonitor = ColabMonitor().start()
+    class Tensorflow_TPUMonitor():
+        def __init__(self, tpu, colabMonitor):
+            service_addr = tpu.get_master()
+            self.service_addr = service_addr.replace('grpc://', '').replace(':8470', ':8466')
+            from tensorflow.python.profiler.internal import _pywrap_profiler
+            self.monitor = _pywrap_profiler.monitor
+            self.colabMonitor = colabMonitor
+            self.mxu = 0
+            self.idle = 100
+            ret = self.monitor(self.service_addr, 1, 2, False)
+            for line in ret.strip().split("\n"):
+                if line.startswith("TPU type:"):
+                    self.type_n_cores = line[10:] + "-" + str(tpu.num_accelerators()['TPU'])
+                    break
+
+        def loop(self):
+            while self.colabMonitor._isLooping:
+                self.update()
+
+        def update(self):
+            ret = self.monitor(self.service_addr, self.colabMonitor._interval, 2, False)
+            self.idle = 100
+            for line in ret.split("\n"):
+                line = line.strip()
+                if line.startswith("TPU idle time"):
+                    self.idle = line[33:-1]
+                elif line.startswith("Utilization of"):
+                    self.mxu = line[52:-1]

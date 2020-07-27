@@ -29,7 +29,16 @@ block content
                 .column
                     h4 GPU memory usage
                     canvas#gpu_memory
+        if sessionInfo['tpu_type'] !== null
+            div="TPU Type : " + sessionInfo['tpu_type']
+            .row
+                .column
+                    h4 TPU MXU
+                    canvas#tpu_mxu
+                .column
+                    h4 TPU idle time
+                    canvas#tpu_idle
     script
         != "var sessionInfo = " + json_encode($sessionInfo) + ";"
         != "var logs = " + json_encode($logs) + ";"
-    script(src="/js/session_info.js")
+    script(src="/js/session_info.js?"+env('APP_VERSION'))

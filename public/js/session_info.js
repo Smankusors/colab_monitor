@@ -14,8 +14,8 @@ charts.loadavg = [{
     label: '5 minute load average',
     borderColor: "#f003",
     backgroundColor: "#f003",
-    data: []}
-];
+    data: []
+}];
 
 charts.cpu_load = []
 yAxisOptions.cpu_load = []
@@ -103,6 +103,35 @@ if (sessionInfo.total_gpu_mem != null) {
         }
     }];
 }
+
+if (sessionInfo.tpu_type != null) {
+    charts.tpu_mxu = [{
+        label: 'Matrix Unit Utilization %',
+        borderColor: "#0093",
+        backgroundColor: "#0093",
+        data: []
+    }];
+    yAxisOptions.tpu_mxu = [{
+        ticks: {
+            beginAtZero: true,
+            max: 100
+        }
+    }];
+
+    charts.tpu_idle = [{
+        label: 'Idle Time %',
+        borderColor: "#0093",
+        backgroundColor: "#0093",
+        data: []
+    }];
+    yAxisOptions.tpu_idle = [{
+        ticks: {
+            beginAtZero: true,
+            max: 100
+        }
+    }];
+}
+
 var timestamps = [];
 function line_chart_config(data, yAxesConfig = {}) {
     return {
@@ -135,6 +164,10 @@ logs.forEach(function(log) {
     if (sessionInfo.total_gpu_mem != null) {
         charts.gpu_load[0].data.push(log.gpu_load);
         charts.gpu_memory[0].data.push((log.gpu_mem * sessionInfo.total_gpu_mem).toFixed(2));
+    }
+    if (sessionInfo.tpu_type != null) {
+        charts.tpu_mxu[0].data.push(log.tpu_mxu);
+        charts.tpu_idle[0].data.push(log.tpu_idle);
     }
 });
 document.querySelectorAll("canvas").forEach(function(el) {
