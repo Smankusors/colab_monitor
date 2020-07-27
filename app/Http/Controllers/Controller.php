@@ -86,7 +86,13 @@ class Controller extends BaseController {
             ->where('id', $id)
             ->orderBy('time', 'desc')
             ->get();
-        $lastUpdated = Carbon::parse($logs[0]->time)->diffForHumans();
+        if ($logs->count() > 0) {
+            $lastUpdatedTime = Carbon::parse($logs[0]->time);
+            $lastUpdated = $lastUpdatedTime->diffForHumans();
+            if ($lastUpdatedTime->diffInMinutes() > 120)
+                $lastUpdated .= " (dead?)";
+        } else
+            $lastUpdated = "no data yet (or maybe error on the notebook?)";
         return view('session_info', [
             'sessionInfo' => $sessionInfo,
             'logs' => $logs,
