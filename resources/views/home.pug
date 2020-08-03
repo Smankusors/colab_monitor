@@ -3,7 +3,6 @@ block content
     div To get started, enter this code below on your notebook 😀
     pre
         code
-            | !echo "185.224.137.80 colab-monitor.smankusors.com" >> /etc/hosts
             | from urllib.request import urlopen
             | exec(urlopen("http://colab-monitor.smankusors.com/track.py").read())
             | _colabMonitor = ColabMonitor().start()
@@ -15,4 +14,4 @@ block content
             | _colabMonitor = ColabMonitor(tpu=tpu).start()
     div
         | Where <code>tpu</code> is instance of <a href="https://www.tensorflow.org/api_docs/python/tf/distribute/cluster_resolver/TPUClusterResolver"><code>TPUClusterResolver</code></a>.
-        | (Note: this is not supported on Kaggle notebooks)
+        | (Note: this is not supported on Kaggle notebooks, and EXPERIMENTAL!)

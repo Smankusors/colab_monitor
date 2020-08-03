@@ -9,6 +9,9 @@ import GPUtil
 import psutil
 
 class ColabMonitor():
+    _interval = 60
+    _isLooping = False
+    tpu = None
     def update(self):
         try:
             gpu = GPUtil.getGPUs()[0]
@@ -37,7 +40,6 @@ class ColabMonitor():
         payload['_token'] = self.token
         self._response = requests.post(
             self.post_url,
-            headers={'Host':'colab-monitor.smankusors.com'},
             data=payload
         )
         if self._response.status_code != 200:
@@ -53,9 +55,7 @@ class ColabMonitor():
             payload['gpu_name'] = gpu.name
         except:
             pass
-        if tpu is None:
-            self.tpu = None
-        else:
+        if tpu is not None:
             self.tpu = self.Tensorflow_TPUMonitor(tpu, self)
             payload['tpu_type'] = self.tpu.type_n_cores
         payload['total_disk_space'] = psutil.disk_usage(self.cwd).total / 1048576
@@ -63,16 +63,14 @@ class ColabMonitor():
         self._last_bytes_sent = net_counter.bytes_sent
         self._last_bytes_recv = net_counter.bytes_recv
         self._response = requests.post(
-            'http://185.224.137.80',
-            headers={'Host':'colab-monitor.smankusors.com'},
+            'http://colab-monitor.smankusors.com',
             data=payload
         )
         if self._response.status_code != 200:
             raise Exception('Failed to add new session! Status code: {}'.format(self._response.status_code))
         self.id, self.token = self._response.text.split(",")
-        self.post_url = "http://185.224.137.80/" + self.id
-        self._interval = 60
-        print("Now live at : http://colab-monitor.smankusors.com/" + self.id)
+        self.post_url = "http://colab-monitor.smankusors.com/" + self.id
+        print("Now live at : " + self.post_url)
 
     def loop(self):
         while self._isLooping:
@@ -80,6 +78,8 @@ class ColabMonitor():
             sleep(self._interval)
 
     def start(self):
+        if (self._isLooping):
+            raise Exception("Monitoring already started!")
         thread = Thread(target=self.loop)
         self._isLooping = True
         thread.start()
@@ -124,10 +124,11 @@ class ColabMonitor():
 
         def loop(self):
             while not self.exit_loop.is_set():
-                self.update()
+                self.update(self.colabMonitor._interval - 1)
+                sleep(1)
 
-        def update(self):
-            ret = self.monitor(self.service_addr, self.colabMonitor._interval * 1000, 2, False)
+        def update(self, interval_s):
+            ret = self.monitor(self.service_addr, interval_s * 1000, 2, False)
             self.idle.value = 100
             for line in ret.split("\n"):
                 line = line.strip()

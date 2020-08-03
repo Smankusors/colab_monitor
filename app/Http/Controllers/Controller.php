@@ -32,11 +32,11 @@ class Controller extends BaseController {
         } catch (QueryException $e) {
             //if there's unknown column, i.e. someone sent bad data,
             if ($e->getCode() === "42S22")
-                return new Response('', 400);
+                return new Response('unknown data', 400);
             if ($e->errorInfo[0] === 'HY000')
                 //if some column required missing on the data
                 if ($e->errorInfo[1] === 1364)
-                    return new Response('', 400);
+                    return new Response('missing data', 400);
             throw $e;
         }
 
@@ -51,25 +51,41 @@ class Controller extends BaseController {
      * @return Response
      */
     public function UpdateSession(Request $request, $id) {
-        $sessionInfo = DB::table('sessions')->where('id', $id)->first();
+        $data = $request->all();
+        if (!isset($data['_token']))
+            return new Response('token required', 400);
+        $sessionInfo = DB::table('sessions')
+            ->where('id', $id)
+            ->first([
+                '*',
+                DB::raw('(SELECT MAX(logs.time) FROM logs WHERE logs.id = sessions.id) as lastUpdated')
+            ]);
         if ($sessionInfo === null)
             return new Response('', 404);
-        $data = $request->all();
+        if ($sessionInfo->lastUpdated !== null) {
+            $lastUpdated = Carbon::parse($sessionInfo->lastUpdated);
+            //rate limited for 3 seconds
+            if ($lastUpdated->diffInSeconds() < 3)
+                return new Response('', 429);
+        }
         if ($sessionInfo->token !== $data['_token'])
             return new Response('', 403);
         unset($data['_token']);
         $data['id'] = $id;
-        $data['cpus_load'] = join(',', $data['cpus_load']);
+        if (!isset($data['cpus_load']))
+            return new Response('missing data', 400);
+        if (is_array($data['cpus_load']))
+            $data['cpus_load'] = join(',', $data['cpus_load']);
         try {
             DB::table('logs')->insert($data);
         } catch (QueryException $e) {
             //if there's unknown column, i.e. someone sent bad data,
             if ($e->getCode() === "42S22")
-                return new Response('', 400);
+                return new Response('unknown data', 400);
             if ($e->errorInfo[0] === 'HY000')
                 //if some column required missing on the data
                 if ($e->errorInfo[1] === 1364)
-                    return new Response('', 400);
+                    return new Response('missing data', 400);
             throw $e;
         }
 

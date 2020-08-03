@@ -16,6 +16,11 @@ charts.loadavg = [{
     backgroundColor: "#f003",
     data: []
 }];
+yAxisOptions.loadavg = [{
+    ticks: {
+        beginAtZero: true
+    }
+}];
 
 charts.cpu_load = []
 yAxisOptions.cpu_load = []
